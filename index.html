@@ -17,7 +17,8 @@ h1{font-size:22px;margin:4px 0}h2{font-size:18px;margin:0 0 14px}
 .sub{color:var(--muted);font-size:14px;margin-bottom:16px}
 .card{background:var(--card);padding:18px;margin-bottom:16px;border-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
 .hero{background:linear-gradient(135deg,#dcecff,#c4cfff);padding:24px 18px;color:#2b2a4c;margin-bottom:16px;position:relative}
-.avatar{width:96px;height:96px;border-radius:50%;background:#3a3263;color:#fff;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;border:3px solid #fff;margin:0 auto}
+.avatar{width:96px;height:96px;border-radius:50%;background:#3a3263;color:#fff;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;border:3px solid #fff;margin:0 auto;overflow:hidden}
+.avatar img{width:100%;height:100%;object-fit:cover;display:block}
 .badge{display:block;width:max-content;margin:-12px auto 22px;background:#7ed321;color:#fff;font-weight:700;font-size:13px;padding:3px 14px;border-radius:20px;border:2px solid #fff;position:relative}
 .hero h1{font-size:24px;margin-bottom:2px}.hero p{margin:2px 0 14px;font-weight:500}
 .hero div.r{font-size:14px;margin:9px 0}
@@ -158,6 +159,7 @@ function C(t,b){return '<div class="card">'+(t?'<h2>'+t+'</h2>':'')+b+'</div>'}
 function E(t,s){return '<div class="empty"><span>ⓘ</span><b>'+t+'</b>'+(s||'')+'</div>'}
 function tile(c,i,t,go){return '<button class="tile" style="background:'+c+'" onclick="go(\''+go+'\')"><span>'+i+'</span>'+t+'</button>'}
 function lc(i,t,s){return '<div class="lc"><div class="ic">'+i+'</div><b>'+t+'</b><small>'+s+'</small></div>'}
+function sem(){return '<div class="card" style="margin:0 0 16px;padding:14px"><label style="font-size:14px;display:block;margin-bottom:6px">Select Semester</label><select class="s"><option>Fall 2026, 263</option><option>Summer 2026, 262</option><option>Spring 2026, 261</option></select><button class="btn full" style="margin-top:10px">Search</button></div>'}
 
 /* --- FIREBASE SYNCED LIVE RESULT STORE --- */
 var LV_KEY='diu_live_results_v8', LV_ED=false;
@@ -479,7 +481,7 @@ function rsDelSem(){
 var V={
 dash:function(){var d=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][new Date().getDay()];
 return '<h1>Dashboard</h1><div class="sub">Student Portal</div>'+
-'<div class="hero"><div class="avatar">AB</div><span class="badge">✓ Active</span><h1>Anik Biswas</h1><p>B.Sc. in Software Engineering</p>'+
+'<div class="hero"><div class="avatar"><img src="profile.jpg" alt="Profile"></div><span class="badge">✓ Active</span><h1>Anik Biswas</h1><p>B.Sc. in Software Engineering</p>'+
 ['🪪 0242510005341518','🪪 251-35-518','👥 45','✉️ 251-35-518@diu.edu.bd','📞 01327901487','🏢 DSC','📅 Feb 2, 2007','⚧ Male','🩸 B+'].map(function(x){return'<div class="r">'+x+'</div>'}).join('')+'</div>'+
 C('Learning Resource','<div class="grid">'+tile('#3a3263','📖','Library','career')+tile('#198754','👥','BLC','career')+tile('#0dcaf0','💻','Go Edu','career')+'</div>')+
 C('Student Service','<div class="grid">'+tile('#6f42c1','🚌','Transport Card Apply','transport')+tile('#dc3545','🏢','Hall Management','hall')+tile('#ffc107','💻','Laptop Scheme','laptop')+'</div>')+
@@ -612,7 +614,7 @@ function initApp(){
     document.querySelectorAll('#side a[data-id]').forEach(function(a){
         a.addEventListener('click', function(e){ e.preventDefault(); go(a.dataset.id); });
     });
-    document.querySelectorAll('[data-g]').forEach(print = function(a){
+    document.querySelectorAll('[data-g]').forEach(function(a){
         a.onclick = function(){
             var g = document.getElementById('g'+a.dataset.g);
             if(g) g.classList.toggle('show');
