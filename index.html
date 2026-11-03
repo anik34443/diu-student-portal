@@ -96,12 +96,12 @@ body.open #side{transform:none}body.open #ov{display:block}
 <body>
 <div id="authwrap">
 <div id="landing" class="landing">
-<div class="login-logo"><img src="https://i.ibb.co.com/84XwX8s0/2549.png" alt="DIU Logo"></div>
+<div class="login-logo"><img src="logo.png" alt="DIU Logo"></div>
 <h1>Student Portal</h1>
 <div class="lcard"><h2>Welcome to Student Portal</h2><button class="bigbtn" onclick="showSignin()">Log In</button></div>
 </div>
 <div id="signin" class="si-wrap" style="display:none">
-<div class="login-logo"><img src="https://i.ibb.co.com/84XwX8s0/2549.png" alt="DIU Logo"></div>
+<div class="login-logo"><img src="logo.png" alt="DIU Logo"></div>
 <div class="si-card">
 <h2>Sign in to your account</h2>
 <div class="fld"><label>Student ID</label><input id="siId" autocomplete="username"></div>
@@ -598,7 +598,7 @@ var siPwEl = document.getElementById('siPw');
 if(siPwEl) siPwEl.addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
 
 function initApp(){
-    var s = '<div class="logo"><img src="https://i.ibb.co.com/84XwX8s0/2549.png" alt="DIU Logo"></div>';
+    var s = '<div class="logo"><img src="logo.png" alt="DIU Logo"></div>';
     MENU.forEach(function(m,i){
         if(m[0]==='g'){
             s += '<a data-g="'+i+'">'+m[1]+' '+m[2]+'<span class="arr">›</span></a><div class="sm" id="g'+i+'">'+m[3].map(function(x){ TITLES[x[0]]=x[1]; return '<a data-id="'+x[0]+'" href="#'+x[0]+'">'+x[1]+'</a>'; }).join('')+'</div>';
@@ -612,7 +612,7 @@ function initApp(){
     document.querySelectorAll('#side a[data-id]').forEach(function(a){
         a.addEventListener('click', function(e){ e.preventDefault(); go(a.dataset.id); });
     });
-    document.querySelectorAll('[data-g]').forEach(function(a){
+    document.querySelectorAll('[data-g]').forEach(print = function(a){
         a.onclick = function(){
             var g = document.getElementById('g'+a.dataset.g);
             if(g) g.classList.toggle('show');
