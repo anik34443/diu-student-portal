@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DIU Student Portal</title>
+<style>
+:root{--bg:#f8f8f8;--card:#fff;--ink:#2b2a4c;--muted:#8a8fa8;--pri:#3a3263;--line:#e5e5ea;--side:#12183a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif;font-size:15px}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--card);border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;padding:14px 14px}
+header button{background:none;border:0;font-size:26px;color:var(--ink);cursor:pointer}
+.who{text-align:right;font-size:13px;font-weight:600}.who small{display:block;color:var(--muted);font-weight:400}
+main{padding:16px;max-width:900px;margin:auto}
+h1{font-size:22px;margin:4px 0}h2{font-size:18px;margin:0 0 14px}
+.sub{color:var(--muted);font-size:14px;margin-bottom:16px}
+.card{background:var(--card);padding:18px;margin-bottom:16px;border-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.hero{background:linear-gradient(135deg,#dcecff,#c4cfff);padding:24px 18px;color:#2b2a4c;margin-bottom:16px;position:relative}
+.avatar{width:96px;height:96px;border-radius:50%;background:#3a3263;color:#fff;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;border:3px solid #fff;margin:0 auto}
+.badge{display:block;width:max-content;margin:-12px auto 22px;background:#7ed321;color:#fff;font-weight:700;font-size:13px;padding:3px 14px;border-radius:20px;border:2px solid #fff;position:relative}
+.hero h1{font-size:24px;margin-bottom:2px}.hero p{margin:2px 0 14px;font-weight:500}
+.hero div.r{font-size:14px;margin:9px 0}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.tile{border-radius:8px;color:#fff;text-align:center;padding:20px 6px;font-size:14px;cursor:pointer;display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center;min-height:84px;border:0;font-family:inherit}
+.tile span{font-size:20px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.lc{border:1px solid var(--line);border-radius:8px;padding:16px 8px;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.05)}
+.lc b{display:block;font-size:17px;margin:6px 0 4px}.lc small{color:var(--muted);font-size:12.5px}.lc .ic{font-size:30px}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:100%}
+th{text-align:left;padding:12px 10px;border-bottom:1.5px solid var(--ink);white-space:nowrap}
+td{padding:14px 10px;border-bottom:1px solid var(--line)}
+td small{display:block;color:var(--muted);font-size:12px;margin-top:3px}
+.ok{color:#198754;font-weight:700}.no{color:#dc3545;font-weight:700}
+.empty{text-align:center;color:var(--muted);padding:26px 8px}.empty b{display:block;color:#8e93b5;font-size:17px;margin:6px 0}
+.cal{background:#1e2f66;color:#fff;margin:-18px -18px 18px;padding:18px}
+.cal h2{margin:0 0 12px}.cal select{width:100%;padding:10px;border-radius:3px;border:1px solid #4a79e6;font-size:14px;font-family:inherit}
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px}
+.stats div{border-radius:10px;padding:12px;font-size:12px;color:#c00}.stats b{display:block;color:#222;font-size:19px;margin-top:6px}
+.btn{background:var(--pri);color:#fff;border:0;padding:9px 12px;border-radius:3px;font-size:14px;cursor:pointer;font-family:inherit}
+.btn.full{width:100%;margin-top:8px;padding:12px}
+select.s{width:100%;padding:11px;border:1px solid #4a79e6;border-radius:3px;font-size:14px;background:var(--card);color:var(--ink);font-family:inherit}
+.row{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:8px}
+.day{border:1px solid var(--line)}.day h3{margin:0;text-align:center;padding:20px 8px;font-size:18px}.day p{margin:0;text-align:center;color:var(--muted);padding:16px;border-top:1px solid var(--line);font-size:14px}
+.note{background:#cff4fc;border:1px solid #9eeaf9;border-radius:4px;padding:18px;color:#055160;font-size:14px;line-height:1.8}
+.note a{color:#0d6efd;text-decoration:none;display:block;line-height:1.9}
+.big{text-align:center;font-size:24px;font-weight:700;padding:14px 4px}
+.fee{background:#2e3192;color:#fff;border-radius:14px;text-align:center;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.12);overflow:hidden}.fee div{padding:20px 8px;font-weight:700;font-size:17px}.fee div+div{border-top:1px solid rgba(255,255,255,.3);font-size:18px}
+.gbtn{background:#198754;color:#fff;border:0;border-radius:3px;padding:9px 12px;font-size:13.5px;cursor:pointer;font-family:inherit;min-width:92px}
+.rt{width:auto;min-width:240px;max-width:360px;margin:4px 0 8px}.rt td{padding:11px 12px;border:1px solid var(--line)}.rt tr:nth-child(odd) td{background:rgba(128,128,128,.1)}.rt td:first-child{font-weight:600}
+#ov{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:20;display:none}
+#side{position:fixed;top:0;bottom:0;left:0;width:78%;max-width:320px;background:var(--side);color:#e6e8f5;z-index:30;transform:translateX(-100%);overflow-y:auto;padding-top:env(safe-area-inset-top,0px)}
+body.open #side{transform:none}body.open #ov{display:block}
+.logo{padding:16px;background:#18204a;text-align:center}.logo img{max-width:140px;height:auto;display:block;margin:0 auto}
+.login-logo{text-align:center;margin-bottom:20px}.login-logo img{max-width:160px;height:auto;display:inline-block}
+#side a{display:flex;align-items:center;gap:14px;padding:15px 16px;color:inherit;text-decoration:none;font-size:15px;cursor:pointer}
+#side a.on{background:#0a0f2b}
+#side .arr{margin-left:auto}.open-g>.arr{transform:rotate(90deg)}
+.sm{display:none;background:#0a0f2b}.sm.show{display:block}
+.sm a{padding:12px 16px 12px 24px;font-size:14px}.sm a::before{content:"·";opacity:.4}
+.landing{padding:40px 16px 20px;text-align:center;max-width:460px;margin:0 auto}
+.landing h1{font-size:24px;margin:4px 0 2px}
+.lcard{background:var(--card);margin-top:20px;padding:26px 20px;border-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.lcard h2{font-size:16px;font-weight:600;margin-bottom:18px}
+.bigbtn{display:block;width:100%;background:var(--pri);color:#fff;border:0;padding:13px;border-radius:4px;font-size:15px;cursor:pointer;font-family:inherit}
+.si-wrap{padding:30px 16px;max-width:400px;margin:0 auto}
+.si-card{background:var(--card);padding:26px 24px;border-radius:4px;box-shadow:0 1px 6px rgba(0,0,0,.08)}
+.si-card h2{font-weight:600;text-align:center;margin:0 0 20px;font-size:18px}
+.fld{margin-bottom:16px}
+.fld label{font-size:13px;display:block;margin-bottom:6px;color:var(--muted)}
+.fld input{width:100%;padding:10px;border:1px solid var(--line);border-radius:3px;font-size:14px;font-family:inherit;background:var(--card);color:var(--ink)}
+.si-err{color:#dc3545;font-size:13px;margin:-8px 0 14px;display:none}
+.rs-title{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:22px}.rs-title h2{margin:0;font-size:20px}
+.rs-lbl{font-size:14px;display:block;margin-bottom:8px}
+.rs-sel{width:100%;padding:11px;border:1px solid var(--line);border-radius:3px;font-size:14px;background:var(--card);color:var(--ink);font-family:inherit}
+.rs-st h2{font-size:20px;margin:0 0 22px}
+.rs-name{color:#4a5fd0;font-size:22px;font-weight:600;margin:0 0 14px}
+.rs-li{font-size:16px;margin:0 0 14px;display:flex;gap:10px;align-items:center}.rs-li i{font-style:normal;width:22px;text-align:center;color:#3f51b5}
+.rs table td,.rs table th{font-size:14.5px}
+.rs tbody tr:nth-child(odd){background:rgba(128,128,128,.1)}
+.rs tr.tot td{border-top:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink)}
+.rs-nb{text-align:center;color:#d9302c;font-size:14px;padding:14px 4px;border-bottom:1px solid var(--line)}.rs-nb a{color:#0d6efd;cursor:pointer;text-decoration:none}
+.rs-gr h2{font-size:20px;margin:0 0 8px}.rs-gr table{font-size:13px}.rs-gr th{font-size:13px;padding:10px}.rs-gr td{padding:13px 10px}
+.rs-eff{text-align:center;font-weight:600;font-size:13px;padding:14px 4px;border-bottom:1px solid var(--line)}
+.rs-in{width:100%;min-width:70px;padding:8px;border:1px solid var(--line);border-radius:3px;font-size:14px;font-family:inherit;background:var(--card);color:var(--ink)}
+.rs-ed .fld{margin-bottom:12px}.rs-ed table{min-width:640px}.rs-ed td{padding:6px 4px}.rs-ed th{padding:8px 4px}
+.rs-x{background:#dc3545;color:#fff;border:0;border-radius:3px;padding:7px 10px;cursor:pointer;font-family:inherit}
+.rs-btns{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.rs-gear{background:none;border:0;font-size:15px;opacity:.35;cursor:pointer;padding:6px;color:var(--ink)}
+.pw-ov{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;display:flex;align-items:center;justify-content:center;padding:16px}
+.pw-box{background:var(--card);color:var(--ink);border-radius:6px;padding:20px;width:100%;max-width:320px;box-shadow:0 4px 18px rgba(0,0,0,.25)}
+.pw-box h3{margin:0 0 12px;font-size:16px}.pw-box .rs-in{margin-bottom:10px}
+</style>
+</head>
+<body>
+<div id="authwrap">
+<div id="landing" class="landing">
+<div class="login-logo"><img src="https://i.ibb.co.com/84XwX8s0/2549.png" alt="DIU Logo"></div>
+<h1>Student Portal</h1>
+<div class="lcard"><h2>Welcome to Student Portal</h2><button class="bigbtn" onclick="showSignin()">Log In</button></div>
+</div>
+<div id="signin" class="si-wrap" style="display:none">
+<div class="login-logo"><img src="https://i.ibb.co.com/84XwX8s0/2549.png" alt="DIU Logo"></div>
+<div class="si-card">
+<h2>Sign in to your account</h2>
+<div class="fld"><label>Student ID</label><input id="siId" autocomplete="username"></div>
+<div class="fld"><label>Password</label><input id="siPw" type="password" autocomplete="current-password"></div>
+<div class="si-err" id="siErr">Invalid Student ID or Password.</div>
+<button class="si-btn btn full" onclick="doLogin()">Sign In</button>
+</div></div>
+</div>
+<div id="appwrap" style="display:none">
+<header><button id="tg" aria-label="menu">☰</button><div class="who">Anik Biswas<small>251-35-518</small></div></header>
+<div id="ov"></div>
+<aside id="side"></aside>
+<main id="app"></main>
+</div>
+
+<!-- Firebase SDK Integration -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAHa6RNJ5Mx1cMp2UnrEre-g7gKIH20In4",
+    authDomain: "student-portal-45b14.firebaseapp.com",
+    projectId: "student-portal-45b14",
+    storageBucket: "student-portal-45b14.firebasestorage.app",
+    messagingSenderId: "187019085228",
+    appId: "1:187019085228:web:3fdab516ff13f463f76609",
+    measurementId: "G-CYYGX30ERB"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  window.fbDb = db;
+  window.fbDoc = doc;
+  window.fbGetDoc = getDoc;
+  window.fbSetDoc = setDoc;
+</script>
+
+<script>
+var MENU=[
+["dash","","Dashboard"],
+["g","","Academic Management",[["calendar","Academic Calendar"],["course","Course Registration"],["clearance","Registration/Exam Clearance"],["routine","Routine"],["teaching","Teaching Evaluation"],["live","Live Results"],["improve","Improvement Apply"],["results","Academic Results"],["cert","Certificates & Transcripts"],["convo","Convocation Application"]]],
+["g","","Financial Service",[["ledger","Payment Ledger"],["waiver","Scholarship & Waiver"],["aidcirc","Financial Aid Circular"],["aidapp","Financial Aid Application"]]],
+["career","","Career Development"],
+["g","","Student Services",[["transport","Transport Card Apply"],["hub","Student Hub"],["hall","Hall Management"],["laptop","Laptop Scheme"],["stuapp","Student Application"],["help","Help Desk"],["mentor","Mentor Meeting"]]],
+["notice","","Notice Board"],["facil","","Facilities"],["logout","","Logout"]];
+var TITLES={};
+var EV=[["Advising & Registration","1 January – 7 January 2026"],["Orientation Program (Newly Admitted Students)","8 January 2026"],["Classes Start","10 January 2026"],["Eid-Al-Fitr Vacation*","19 March–23 March 2026"],["Mid-Examination","28 March–10 April 2026"],["Eid-Al-Adha Vacation*","26 May–31 May 2026"],["Preparatory Leave","5 June–7 June 2026"],["Final Examination","8 June–23 June 2026"],["Last Date of Grade Submission","27 June 2026"],["Publication of Semester Results","28 June 2026"],["Semester Break","28 June–30 June 2026"],["Advising & Registration of Next Semester","1 July–9 July 2026"],["Classes Start of Next Semester","11 July 2026"]];
+var CL=[["Summer 2025 (252)",0,0,1],["Fall 2025 (253)",1,0,0],["Spring 2026 (261)",1,0,1],["Summer 2026 (262)",1,0,0]];
+
+function T(h,rows,empty){return '<div class="tw"><table><thead><tr>'+h.map(function(x){return'<th>'+x+'</th>'}).join('')+'</tr></thead><tbody>'+(rows||'')+'</tbody></table>'+(empty?'<div class="empty">'+empty+'</div>':'')+'</div>'}
+function C(t,b){return '<div class="card">'+(t?'<h2>'+t+'</h2>':'')+b+'</div>'}
+function E(t,s){return '<div class="empty"><span>ⓘ</span><b>'+t+'</b>'+(s||'')+'</div>'}
+function tile(c,i,t,go){return '<button class="tile" style="background:'+c+'" onclick="go(\''+go+'\')"><span>'+i+'</span>'+t+'</button>'}
+function lc(i,t,s){return '<div class="lc"><div class="ic">'+i+'</div><b>'+t+'</b><small>'+s+'</small></div>'}
+
+/* --- FIREBASE SYNCED LIVE RESULT STORE --- */
+var LV_KEY='diu_live_results_v8', LV_ED=false;
+function getDefLiveStore(){
+    return {
+        sel: 0,
+        sems: [
+            {
+                name: 'Summer 2026, 262',
+                courses: [
+                    ["SE 133","Software Development Capstone Project",3,"45_L1","Dr. Md. Fazla Elahe",["92%","0","0","0","0","0","0"]],
+                    ["SE 223","Database System",3,"45_M","Tapushe Rabaya Toma",["68%","8","9","10","9","2","0"]]
+                ]
+            },
+            {
+                name: 'Spring 2026, 261',
+                courses: [
+                    ["SE 121","Object Oriented Programming",3,"44_A","Instructor Name",["90%","5","8","9","7","15","0"]]
+                ]
+            }
+        ]
+    };
+}
+
+var LV_STORE = getDefLiveStore();
+
+async function loadCloudData(){
+    try{
+        if(window.fbDb){
+            var docSnap = await window.fbGetDoc(window.fbDoc(window.fbDb, "portalData", "mainStore"));
+            if(docSnap.exists()){
+                var cloudData = docSnap.data();
+                if(cloudData.live) LV_STORE = cloudData.live;
+                if(cloudData.results) RS = cloudData.results;
+                render();
+                rsPaint(true);
+            }
+        }
+    }catch(e){console.log('Cloud load fallback to local', e);}
+}
+
+function lvSave(){
+    try{ localStorage.setItem(LV_KEY, JSON.stringify(LV_STORE)); }catch(e){}
+    syncToCloud();
+}
+
+async function syncToCloud(){
+    try{
+        if(window.fbDb){
+            await window.fbSetDoc(window.fbDoc(window.fbDb, "portalData", "mainStore"), {
+                live: LV_STORE,
+                results: RS
+            }, { merge: true });
+        }
+    }catch(e){console.log('Cloud save error', e);}
+}
+
+function lvCur(){
+    if(!LV_STORE.sems || !LV_STORE.sems.length) LV_STORE = getDefLiveStore();
+    if(LV_STORE.sel < 0 || LV_STORE.sel >= LV_STORE.sems.length) LV_STORE.sel = 0;
+    return LV_STORE.sems[LV_STORE.sel];
+}
+function lvCell(i, j, el){
+    var cur = lvCur();
+    if(cur.courses && cur.courses[i]){
+        cur.courses[i][j] = el.value;
+        lvSave();
+    }
+}
+function lvStatCell(i, statIdx, el){
+    var cur = lvCur();
+    if(cur.courses && cur.courses[i]){
+        if(!Array.isArray(cur.courses[i][5])) cur.courses[i][5] = ["0%","0","0","0","0","0","0"];
+        else cur.courses[i][5] = [].concat(cur.courses[i][5]);
+        cur.courses[i][5][statIdx] = el.value;
+        lvSave();
+    }
+}
+function lvAddRow(){
+    var cur = lvCur();
+    if(!cur.courses) cur.courses = [];
+    cur.courses.push(["NEW CODE","New Course Title",3,"45_A","Teacher Name",["0%","0","0","0","0","0","0"]]);
+    lvSave();
+    if(CUR==='live') render();
+}
+function lvDelRow(i){
+    var cur = lvCur();
+    if(cur.courses && cur.courses[i]){
+        cur.courses.splice(i,1);
+        lvSave();
+        if(CUR==='live') render();
+    }
+}
+function lvSetName(el){
+    var cur = lvCur();
+    cur.name = el.value;
+    lvSave();
+    var selEl = document.getElementById('lvSemSel');
+    if(selEl && selEl.options[selEl.selectedIndex]){
+        selEl.options[selEl.selectedIndex].text = el.value;
+    }
+}
+function lvAddSem(){
+    var el = document.getElementById('lvNewSem'), n = el && el.value ? el.value.trim() : '';
+    if(!n){ if(el) el.focus(); return; }
+    LV_STORE.sems.push({ name: n, courses: [] });
+    LV_STORE.sel = LV_STORE.sems.length - 1;
+    lvSave();
+    if(el) el.value = '';
+    if(CUR==='live') render();
+}
+function lvDelSem(){
+    if(LV_STORE.sems.length < 2){ alert('At least one semester is required.'); return; }
+    if(!confirm('Delete "'+lvCur().name+'"?')) return;
+    LV_STORE.sems.splice(LV_STORE.sel, 1);
+    LV_STORE.sel = 0;
+    lvSave();
+    if(CUR==='live') render();
+}
+function lvSearch(){
+    var selEl = document.getElementById('lvSemSel');
+    if(selEl){
+        var v = parseInt(selEl.value, 10);
+        if(!isNaN(v) && v >= 0 && v < LV_STORE.sems.length){
+            LV_STORE.sel = v;
+            lvSave();
+        }
+    }
+    if(CUR==='live') render();
+}
+
+function lvEdRender(){
+    if(!LV_ED) return '';
+    var cur = lvCur();
+    var rows = (cur.courses || []).map(function(d, i){
+        var stats = Array.isArray(d[5]) ? d[5] : ["0%","0","0","0","0","0","0"];
+        return '<tr>'+
+        '<td><b>#'+(i+1)+'</b></td>'+
+        '<td><input class="rs-in" value="'+rsEsc(d[0])+'" placeholder="Code" oninput="lvCell('+i+',0,this)"></td>'+
+        '<td><input class="rs-in" value="'+rsEsc(d[1])+'" placeholder="Title" oninput="lvCell('+i+',1,this)"></td>'+
+        '<td><input class="rs-in" value="'+rsEsc(d[2])+'" placeholder="Credit" oninput="lvCell('+i+',2,this)"></td>'+
+        '<td><input class="rs-in" value="'+rsEsc(d[3])+'" placeholder="Section" oninput="lvCell('+i+',3,this)"></td>'+
+        '<td><input class="rs-in" value="'+rsEsc(d[4])+'" placeholder="Teacher" oninput="lvCell('+i+',4,this)"></td>'+
+        '<td>'+
+            '<small>Atten: <input class="rs-in" style="width:55px" value="'+rsEsc(stats[0])+'" oninput="lvStatCell('+i+',0,this)"></small>'+
+            '<small>Q1: <input class="rs-in" style="width:45px" value="'+rsEsc(stats[1])+'" oninput="lvStatCell('+i+',1,this)"></small>'+
+            '<small>Q2: <input class="rs-in" style="width:45px" value="'+rsEsc(stats[2])+'" oninput="lvStatCell('+i+',2,this)"></small>'+
+            '<small>Q3: <input class="rs-in" style="width:45px" value="'+rsEsc(stats[3])+'" oninput="lvStatCell('+i+',3,this)"></small>'+
+            '<small>Q-Avg: <input class="rs-in" style="width:45px" value="'+rsEsc(stats[4])+'" oninput="lvStatCell('+i+',4,this)"></small>'+
+            '<small>Mid: <input class="rs-in" style="width:45px" value="'+rsEsc(stats[5])+'" oninput="lvStatCell('+i+',5,this)"></small>'+
+        '</td>'+
+        '<td><button class="rs-x" onclick="lvDelRow('+i+')">✕</button></td>'+
+        '</tr>';
+    }).join('');
+
+    return '<div class="card rs-ed"><h2>Review – Edit Live Results</h2>'+
+    '<div class="fld"><label>New semester name</label><input class="rs-in" id="lvNewSem" placeholder="e.g. Fall 2026, 263"></div>'+
+    '<div class="rs-btns"><button class="btn" onclick="lvAddSem()">＋ Add Semester</button><button class="rs-x" onclick="lvDelSem()">Delete this semester</button></div>'+
+    '<div class="fld"><label>Semester name (selected)</label><input class="rs-in" value="'+rsEsc(cur.name)+'" oninput="lvSetName(this)"></div>'+
+    '<div class="tw"><table><thead><tr><th>SL</th><th>Code</th><th>Title</th><th>Cr</th><th>Sec</th><th>Teacher</th><th>Attendance & Marks Details</th><th>Action</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
+    '<div class="rs-btns" style="margin-top:12px"><button class="btn" onclick="lvAddRow()">＋ Add Course</button><button class="btn" style="background:#198754" onclick="LV_ED=false;render()">Done</button></div></div>';
+}
+
+/* --- ACADEMIC RESULTS STORE & EDIT LOGIC --- */
+var RS_KEY='diu_results_v5', RS_ED=false, IS_LOGGED_IN=false;
+function getDefData() {
+    return {
+        sel: 0,
+        sems: [{
+            name: 'Summer 2026, 262',
+            top: '0.00',
+            courses: [
+                ['AOL 101','Art of Living','3.00','','0.00'],
+                ['SE 222','Computer Architecture','3.00','','0.00'],
+                ['SE 224','Database System Lab','1.00','','0.00'],
+                ['SE 223','Database System','3.00','','0.00']
+            ],
+            tc: '10.00',
+            sg: '0.00'
+        }]
+    };
+}
+
+var RS = getDefData();
+
+function rsSave(){
+    try { localStorage.setItem(RS_KEY, JSON.stringify(RS)); } catch(e){}
+    syncToCloud();
+}
+function rsEsc(s){
+    return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function rsCur(){
+    if(!RS.sems || !RS.sems.length) { RS = getDefData(); }
+    if(RS.sel < 0 || RS.sel >= RS.sems.length) RS.sel = 0;
+    return RS.sems[RS.sel];
+}
+function rsTop(){
+    var o = RS.sems.map(function(x,i){
+        return '<option value="'+i+'"'+(i===RS.sel?' selected':'')+'>'+rsEsc(x.name || 'Unnamed')+'</option>';
+    }).join('');
+    return '<div class="card"><div class="rs-title"><h2>Academic Result</h2></div><label class="rs-lbl">Select Semester</label><select class="rs-sel" id="rsSel">'+o+'</select><button class="btn full" onclick="rsSearch()">Search</button></div>';
+}
+function rsBody(){
+    var s = rsCur();
+    var rows = (s.courses || []).map(function(c,i){
+        return '<tr><td>'+(i+1)+'</td><td>'+rsEsc(c[0])+'</td><td>'+rsEsc(c[1])+'</td><td>'+rsEsc(c[2])+'</td><td>'+rsEsc(c[3])+'</td><td>'+rsEsc(c[4])+'</td></tr>';
+    }).join('');
+    
+    var G=[['80–100','A+','4.00','Outstanding'],['75–79','A','3.75','Excellent'],['70–74','A-','3.50','Very Good'],['65–69','B+','3.25','Good'],['60–64','B','3.00','Satisfactory'],['55–59','B-','2.75','Above Average'],['50–54','C+','2.50','Average'],['45–49','C','2.25','Below Average'],['40–44','D','2.00','Pass'],['00–39','F','0.00','Fail']];
+    var gr = G.map(function(g){return '<tr><td>'+g[0]+'</td><td>'+g[1]+'</td><td>'+g[2]+'</td><td>'+g[3]+'</td></tr>';}).join('');
+    
+    return '<div class="card rs-st"><h2>🎓 Student Information</h2><div class="rs-name">Anik Biswas</div>'
+    +'<div class="rs-li"><i>🖥️</i>B.Sc. in Software Engineering</div><div class="rs-li"><i>👥</i>Batch: 45</div><div class="rs-li"><i>🪪</i>Student ID: 0242510005341518</div><div class="rs-li"><i>📇</i>Reg ID: 251-35-518</div><div class="rs-li"><i>ℹ️</i>SGPA of '+rsEsc(s.name)+': '+rsEsc(s.top)+'</div>'
+    +'<div class="rs tw" style="margin-top:22px"><table><thead><tr><th>SL</th><th>Course Code</th><th>Course Title</th><th>Credit</th><th>Grade</th><th>Grade Point</th></tr></thead><tbody>'+rows+'<tr class="tot"><td colspan="3" style="text-align:right">Total Credit</td><td>'+rsEsc(s.tc)+'</td><td style="text-align:right">SGPA</td><td>'+rsEsc(s.sg)+'</td></tr></tbody></table></div>'
+    +'<div class="rs-nb">N.B. : If you see Teaching Evaluation Pending in any course. Please complete <a onclick="go(\'teaching\')">Teaching Evaluation</a>.</div></div>'
+    +'<div class="card rs-gr"><h2>UGC Uniform Grading System</h2><div class="rs tw"><table><thead><tr><th>Marks (%)</th><th>Grade</th><th>Grade Point</th><th>Remarks</th></tr></thead><tbody>'+gr+'</tbody></table><div class="rs-eff">Effective from Summer Semester 2007</div></div></div>';
+}
+function rsEd(){
+    if(!RS_ED) return '';
+    var s = rsCur();
+    var rows = (s.courses || []).map(function(c,i){
+        var inp = function(j){ return '<td><input class="rs-in" value="'+rsEsc(c[j])+'" oninput="rsCell('+i+','+j+',this.value)"></td>'; };
+        return '<tr><td>'+(i+1)+'</td>'+inp(0)+inp(1)+inp(2)+inp(3)+inp(4)+'<td><button class="rs-x" onclick="rsDelRow('+i+')">✕</button></td></tr>';
+    }).join('');
+    
+    return '<div class="card rs-ed"><h2>Review – Edit Academic Result</h2>'
+    +'<div class="fld"><label>New semester name</label><input class="rs-in" id="rsNew" placeholder="e.g. Fall 2026, 263"></div><div class="rs-btns"><button class="btn" onclick="rsAddSem()">＋ Add Semester</button><button class="rs-x" onclick="rsDelSem()">Delete this semester</button></div>'
+    +'<div class="fld"><label>Semester name (selected)</label><input class="rs-in" value="'+rsEsc(s.name)+'" oninput="rsSet(\'name\',this.value)"></div>'
+    +'<div class="fld"><label>SGPA of '+rsEsc(s.name)+' (top line)</label><input class="rs-in" value="'+rsEsc(s.top)+'" oninput="rsSet(\'top\',this.value)"></div>'
+    +'<div class="tw"><table><thead><tr><th>SL</th><th>Course Code</th><th>Course Title</th><th>Credit</th><th>Grade</th><th>Grade Point</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>'
+    +'<div class="rs-btns"><button class="btn" onclick="rsAddRow()">＋ Add Course</button></div>'
+    +'<div class="g2"><div class="fld"><label>Total Credit</label><input class="rs-in" value="'+rsEsc(s.tc)+'" oninput="rsSet(\'tc\',this.value)"></div><div class="fld"><label>SGPA (table)</label><input class="rs-in" value="'+rsEsc(s.sg)+'" oninput="rsSet(\'sg\',this.value)"></div></div>'
+    +'<button class="btn full" onclick="rsToggle()">Done</button></div>';
+}
+function rsPaint(e){
+    rsSave();
+    var t = document.getElementById('rsTop'); if(t) t.innerHTML = rsTop();
+    var b = document.getElementById('rsBody'); if(b) b.innerHTML = rsBody();
+    if(e){
+        var ed = document.getElementById('rsEd');
+        if(ed) ed.innerHTML = rsEd();
+    }
+}
+
+var RS_PW='wanik203', RS_UNL=false;
+try{ RS_UNL = localStorage.getItem('diu_rs_unlock')==='1'; }catch(e){}
+
+function rsToggle(){
+    if(!RS_ED && !RS_UNL){ go('teaching'); return; }
+    RS_ED = !RS_ED;
+    rsPaint(true);
+}
+function rsPw(){
+    document.getElementById('pwBox').innerHTML='<div class="pw-ov"><div class="pw-box"><h3>Settings / Admin Options</h3><input class="rs-in" id="pwIn" type="password" placeholder="Enter password" autocomplete="off" onkeydown="if(event.key===\'Enter\')rsUnlock()"><div class="si-err" id="pwErr" style="margin:0 0 10px">Wrong password.</div><div class="rs-btns" style="margin:0"><button class="btn" onclick="rsUnlock()">OK</button><button class="btn" style="background:#8a8fa8" onclick="rsPwClose()">Cancel</button></div></div></div>';
+    var i = document.getElementById('pwIn'); if(i) i.focus();
+}
+function rsPwClose(){
+    var b = document.getElementById('pwBox'); if(b) b.innerHTML='';
+}
+function rsUnlock(){
+    var v = String(document.getElementById('pwIn').value||'').toLowerCase().replace(/\s+/g,'');
+    if(v === RS_PW){
+        RS_UNL = true;
+        try{ localStorage.setItem('diu_rs_unlock','1'); }catch(e){}
+        document.getElementById('pwBox').innerHTML='<div class="pw-ov"><div class="pw-box"><h3>Select Option to Edit</h3><div class="rs-btns" style="flex-direction:column;gap:10px"><button class="btn full" onclick="rsPwClose();go(\'results\');RS_ED=true;rsPaint(true)">✏️ Edit Academic Result</button><button class="btn full" style="background:#198754" onclick="rsPwClose();go(\'live\');LV_ED=true;render()">✏️ Edit Live Results</button><button class="btn full" style="background:#8a8fa8" onclick="rsPwClose()">Cancel</button></div></div></div>';
+    } else {
+        var err = document.getElementById('pwErr');
+        if(err) err.style.display = 'block';
+    }
+}
+function rsSearch(){
+    var selEl = document.getElementById('rsSel');
+    if(selEl){
+        var v = parseInt(selEl.value, 10);
+        if(!isNaN(v) && v >= 0 && v < RS.sems.length){
+            RS.sel = v;
+            rsSave();
+        }
+    }
+    rsPaint(true);
+}
+function rsSet(k,v){ rsCur()[k]=v; rsSave(); rsPaint(false); }
+function rsCell(i,j,v){
+    var c = rsCur().courses;
+    if(c && c[i]) { c[i][j] = v; rsSave(); rsPaint(false); }
+}
+function rsAddRow(){
+    if(!rsCur().courses) rsCur().courses = [];
+    rsCur().courses.push(['','','','','']);
+    rsSave();
+    rsPaint(true);
+}
+function rsDelRow(i){
+    if(rsCur().courses && rsCur().courses[i]) {
+        rsCur().courses.splice(i,1);
+        rsSave();
+        rsPaint(true);
+    }
+}
+function rsAddSem(){
+    var el = document.getElementById('rsNew'), n = el && el.value ? el.value.trim() : '';
+    if(!n){ if(el) el.focus(); return; }
+    RS.sems.push({name:n, top:'0.00', courses:[], tc:'0.00', sg:'0.00'});
+    RS.sel = RS.sems.length - 1;
+    rsSave();
+    rsPaint(true);
+    if(el) el.value = '';
+}
+function rsDelSem(){
+    if(RS.sems.length < 2){ alert('At least one semester is required.'); return; }
+    if(!confirm('Delete "'+rsCur().name+'"?')) return;
+    RS.sems.splice(RS.sel, 1);
+    RS.sel = 0;
+    rsSave();
+    rsPaint(true);
+}
+
+var V={
+dash:function(){var d=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][new Date().getDay()];
+return '<h1>Dashboard</h1><div class="sub">Student Portal</div>'+
+'<div class="hero"><div class="avatar">AB</div><span class="badge">✓ Active</span><h1>Anik Biswas</h1><p>B.Sc. in Software Engineering</p>'+
+['🪪 0242510005341518','🪪 251-35-518','👥 45','✉️ 251-35-518@diu.edu.bd','📞 01327901487','🏢 DSC','📅 Feb 2, 2007','⚧ Male','🩸 B+'].map(function(x){return'<div class="r">'+x+'</div>'}).join('')+'</div>'+
+C('Learning Resource','<div class="grid">'+tile('#3a3263','📖','Library','career')+tile('#198754','👥','BLC','career')+tile('#0dcaf0','💻','Go Edu','career')+'</div>')+
+C('Student Service','<div class="grid">'+tile('#6f42c1','🚌','Transport Card Apply','transport')+tile('#dc3545','🏢','Hall Management','hall')+tile('#ffc107','💻','Laptop Scheme','laptop')+'</div>')+
+C('Academic','<div class="grid">'+tile('#212529','📈','Live Result','live')+tile('#6f42c1','📅','Routine','routine')+tile('#20c997','🎓','Certificate & Transcript','cert')+'</div>')+
+C('📅 Today\'s Routine – '+d,'')},
+live:function(){
+    var L=['Attendance Percentage','Quiz 1','Quiz 2','Quiz 3','Quiz Average','Midterm','Midterm Improvement'];
+    var cur = lvCur();
+    var opts = LV_STORE.sems.map(function(x,i){
+        return '<option value="'+i+'"'+(i===LV_STORE.sel?' selected':'')+'>'+rsEsc(x.name)+'</option>';
+    }).join('');
+
+    var topHtml = '<div class="card"><div class="rs-title"><h2>Live Result</h2></div><label class="rs-lbl">Select Semester</label><select class="rs-sel" id="lvSemSel">'+opts+'</select><button class="btn full" onclick="lvSearch()">Search</button></div>';
+
+    window.lvT=function(i){var r=document.getElementById('lv'+i),o=r.style.display!=='table-row';document.querySelectorAll('.lvd').forEach(function(x){x.style.display='none'});if(o)r.style.display='table-row'};
+    
+    var rows=(cur.courses || []).map(function(d,i){
+        var stats = Array.isArray(d[5]) ? d[5] : ["0%","0","0","0","0","0","0"];
+        return '<tr><td><button class="gbtn" onclick="lvT('+i+')">View Result</button></td><td>'+(i+1)+'</td><td>'+rsEsc(d[0])+'</td><td>'+rsEsc(d[1])+'</td><td>'+rsEsc(d[2])+'</td><td>'+rsEsc(d[3])+'</td><td>'+rsEsc(d[4])+'</td></tr><tr class="lvd" id="lv'+i+'" style="display:none"><td colspan="7"><table class="rt">'+L.map(function(l,k){return '<tr><td>'+l+'</td><td>'+rsEsc(stats[k])+'</td></tr>'}).join('')+'</table></td></tr>';
+    }).join('');
+    
+    return topHtml + lvEdRender() + C('Live Result Details', T(['Action','SL','Course Code','Course Title','Credit','Section','Teacher'],rows));
+},
+ledger:function(){var f=function(t,v){return '<div class="fee"><div>'+t+'</div><div>'+v+'</div></div>'};
+return f('Registration Fee','33,867.00')+f('Total Payable','407,635.00')+f('Total Paid','327,315.00')+f('Total Due','80,320.00')+f('Total Other','2,400.00')+C('Payment Ledger','<label style="font-size:14px">Select Semester</label><select class="s" style="margin:8px 0"><option></option></select><button class="btn full">Search</button><div style="margin-top:14px">'+T(['SL','Transaction Date','Collected By','Head Description','Receivable','Paid','Other'])+'</div>')},
+results:function(){return '<div id="rsTop">'+rsTop()+'</div><div id="rsEd">'+rsEd()+'</div><div id="rsBody">'+rsBody()+'</div>'},
+calendar:function(){return '<div class="card"><div class="cal"><h2>📅 Academic Calendar</h2><select><option>Spring-2026 (BI)</option></select></div><div class="stats"><div style="background:#e8f0fe">Academic Year<b>2026</b></div><div style="background:#e9f8ef">Duration<b>January-June</b></div><div style="background:#f1eefc">Total Events<b>'+EV.length+'</b></div></div>'+T(['Event','Date'],EV.map(function(e){return'<tr><td>'+e[0]+'<small>'+e[0].toLowerCase().replace(/ /g,'-')+'</small></td><td>🕒 '+e[1]+'</td></tr>'}).join(''))+'</div>'},
+clearance:function(){var m=function(v){return v?'<span class="ok">✓</span>':'<span class="no">✕</span>'};return C('Registration/Exam Clearance',T(['SL','Semester','Registration','Mid-Term Exam','Final Exam'],CL.map(function(r,i){return'<tr><td>'+(i+1)+'</td><td>'+r[0]+'</td><td>'+m(r[1])+'</td><td>'+m(r[2])+'</td><td>'+m(r[3])+'</td></tr>'}).join('')))},
+routine:function(){return C('Routine',sem()+'<div class="day" style="margin-top:14px">'+['Saturday','Sunday','Monday','Tuesday','Wednesday','Thursday','Friday'].map(function(d){return'<h3>'+d+'</h3><p>No Classes on '+d+'</p>'}).join('')+'</div>')},
+teaching:function(){
+    var opts = '<label style="font-size:14px">Select Semester</label><select class="s" style="margin:8px 0"><option>Fall 2026, 263</option><option>Summer 2026, 262</option><option>Spring 2026, 261</option></select><button class="btn full">Search</button>';
+    return C('Teaching Evaluation', opts + T(['Submit Status','Course','Section','Teacher'])) + '<div style="text-align:right;margin-top:60px"><button class="rs-gear" aria-label="settings" onclick="rsPw()">⚙</button></div><div id="pwBox"></div>';
+},
+improve:function(){return '<h2 style="color:var(--pri)">Improvement Application</h2>'+E('No Improvement Available','There are currently no improvement applications available.')+C('Improvement Application List',T(['SL','Student Name','Student ID','Course Code','Course Title','Credit','Section','Type','Teacher','Status','Edit']))},
+convo:function(){return C('Convocation Apply','<div class="big">You are not eligible for Convocation !</div>')},
+waiver:function(){return C('🎓 Semester Waiver',E('No Semester Waiver','You have no Semester Waiver'))+C('🎓 Fixed Waiver',E('No Fixed Waiver Found','You have no fixed waiver'))},
+aidcirc:function(){return '<h2 style="color:var(--pri)">🎓 Available Scholarships</h2>'+E('No Scholarships Available')},
+aidapp:function(){return C('Applied Scholarship Application',T(['Action','Status','SL','Application ID','Applicant Name','Student ID','Registration ID','Semester','Scholarship Type','Appl. Fee'],'','No application available'))},
+career:function(){return C('Career Services','<div class="g2">'+lc('🎓','Internship','Find internship opportunities.')+lc('🧭','CDC','Career Development Center.')+lc('🎪','Job Utsob','Explore job fairs & recruitment events.')+lc('💼','Skill Jobs','Search jobs based on your skills.')+'</div>')+C('Learning Resources','<div class="g2">'+lc('📚','Library','Access the digital library catalog.')+lc('🎓','BLC','Bright Language Center.')+lc('🌍','Go Edu','Study abroad & higher education services.')+lc('🏫','IOU','International Opportunities & collaborations.')+'</div>')},
+transport:function(){return C('<span style="display:flex;justify-content:space-between;align-items:center;gap:8px">Transport Card <button class="btn" style="font-size:13px">＋ Transport Card Apply</button></span>',T(['Action','Student ID','Package Name','Location','Start Date','Expiry Date','Status','Payment Status','Card Status','Apply Amount','Paid Amount']))+C('Contact Point','<div class="note"><b>📢 Notice</b><br>If you require any support or have feedback/suggestions, please contact us via the following:<br><b>🏢 Office Address:</b> Transport Office, DSC<br><b>📧 Email:</b> <span style="color:#0d6efd">transport-dsc@daffodilvarsity.edu.bd</span><br><b>📱 Mobile:</b> 01847140037<br><br><b>🔗 Useful Links</b><a href="#transport">📄 Transport Policy</a><a href="#transport">🎫 Help Desk</a><a href="#transport">🚌 Transport Schedule</a><a href="#transport">📺 Display Board</a><a href="#transport">🌐 Transport Website</a></div>')},
+stuapp:function(){return C('<span style="display:flex;justify-content:space-between;align-items:center">Application List <button class="btn" style="font-size:13px">Apply New</button></span>',T(['SL','Apply Date','Delivery Date','Paid Amount','Status','Detail']))},
+laptop:function(){return C('Laptop Scheme',E('Laptop Scheme Status','You are not yet eligible for Laptop.'))},
+notice:function(){return C('Notice Board','<div style="border-left:4px solid var(--pri);padding:6px 12px"><b>Seat Plan 02 November Slot-C</b><small style="display:block;color:var(--muted);margin-top:4px">Civil Engineering | Examination</small></div>')}
+};
+
+var CUR='dash';
+
+function render(){
+    if(!IS_LOGGED_IN){ showLanding(); return; }
+    var id = CUR;
+    if(id==='logout'){ doLogout(); return; }
+    var f = V[id];
+    var appEl = document.getElementById('app');
+    if(appEl) appEl.innerHTML = f ? f() : C(TITLES[id]||'Section',E('Data not Found!!'));
+    document.querySelectorAll('#side a').forEach(function(a){ a.classList.toggle('on', a.dataset.id === id); });
+    document.body.classList.remove('open');
+    window.scrollTo(0,0);
+}
+
+function go(id){
+    if(!IS_LOGGED_IN){ showLanding(); return; }
+    CUR = id;
+    try{ location.hash = id; }catch(e){}
+    render();
+}
+
+var APP_READY=false, CREDS={id:'251-35-518',pw:'anikanik'};
+
+function showLanding(){
+    IS_LOGGED_IN = false;
+    document.getElementById('authwrap').style.display = '';
+    document.getElementById('appwrap').style.display = 'none';
+    document.getElementById('landing').style.display = '';
+    document.getElementById('signin').style.display = 'none';
+    document.getElementById('siErr').style.display = 'none';
+}
+
+function showSignin(){
+    document.getElementById('landing').style.display = 'none';
+    document.getElementById('signin').style.display = '';
+    document.getElementById('siErr').style.display = 'none';
+    document.getElementById('siId').value = '';
+    document.getElementById('siPw').value = '';
+}
+
+function doLogin(){
+    var idv = (document.getElementById('siId').value||'').trim();
+    var pwv = document.getElementById('siPw').value||'';
+    if(idv === CREDS.id && pwv === CREDS.pw){
+        IS_LOGGED_IN = true;
+        document.getElementById('authwrap').style.display = 'none';
+        document.getElementById('appwrap').style.display = '';
+        if(!APP_READY){ 
+            initApp(); 
+            loadCloudData();
+            APP_READY = true; 
+        } else { 
+            loadCloudData();
+            go('dash'); 
+        }
+    } else {
+        document.getElementById('siErr').style.display = 'block';
+    }
+}
+
+function doLogout(){
+    IS_LOGGED_IN = false;
+    document.getElementById('appwrap').style.display = 'none';
+    document.getElementById('authwrap').style.display = '';
+    showLanding();
+    CUR = 'dash';
+    try{ history.replaceState(null, '', location.pathname + location.search); }catch(e){}
+}
+
+var siPwEl = document.getElementById('siPw');
+if(siPwEl) siPwEl.addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
+
+function initApp(){
+    var s = '<div class="logo"><img src="https://i.ibb.co.com/84XwX8s0/2549.png" alt="DIU Logo"></div>';
+    MENU.forEach(function(m,i){
+        if(m[0]==='g'){
+            s += '<a data-g="'+i+'">'+m[1]+' '+m[2]+'<span class="arr">›</span></a><div class="sm" id="g'+i+'">'+m[3].map(function(x){ TITLES[x[0]]=x[1]; return '<a data-id="'+x[0]+'" href="#'+x[0]+'">'+x[1]+'</a>'; }).join('')+'</div>';
+        } else {
+            TITLES[m[0]] = m[2];
+            s += '<a data-id="'+m[0]+'" href="#'+m[0]+'">'+m[1]+' '+m[2]+'</a>';
+        }
+    });
+    
+    document.getElementById('side').innerHTML = s;
+    document.querySelectorAll('#side a[data-id]').forEach(function(a){
+        a.addEventListener('click', function(e){ e.preventDefault(); go(a.dataset.id); });
+    });
+    document.querySelectorAll('[data-g]').forEach(function(a){
+        a.onclick = function(){
+            var g = document.getElementById('g'+a.dataset.g);
+            if(g) g.classList.toggle('show');
+            a.classList.toggle('open-g');
+        };
+    });
+    
+    var tgEl = document.getElementById('tg'); if(tgEl) tgEl.onclick = function(){ document.body.classList.toggle('open'); };
+    var ovEl = document.getElementById('ov'); if(ovEl) ovEl.onclick = function(){ document.body.classList.remove('open'); };
+    
+    window.addEventListener('hashchange', function(){
+        if(!IS_LOGGED_IN) { showLanding(); return; }
+        var h = (location.hash||'').slice(1);
+        if(h && h !== CUR){ CUR = h; render(); }
+    });
+    
+    go('dash');
+}
+
+showLanding();
+</script>
+</body>
+</html>
