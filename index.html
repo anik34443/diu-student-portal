@@ -217,17 +217,20 @@ function loadCloudData(){
     }catch(e){console.log('Cloud load error', e);}
 }
 
+// ফায়ারবেসের নেস্টেড অ্যারে এরর সলভের জন্য নিরাপদ ক্লাউড সিঙ্ক
 async function syncToCloud(){
     try{
         if(window.fbDb && window.fbDoc && window.fbSetDoc){
-            // নেস্টেড অ্যারে বা কাস্টম অবজেক্টকে ফায়ারবেস ফ্রেন্ডলি প্লেন অবজেক্টে রূপান্তর করা হচ্ছে
-            var cleanData = JSON.parse(JSON.stringify({
-                live: LV_STORE,
-                results: RS,
-                courses: CR_STORE
-            }));
+            var safeLive = JSON.parse(JSON.stringify(LV_STORE || {}));
+            var safeResults = JSON.parse(JSON.stringify(RS || {}));
+            var safeCourses = JSON.parse(JSON.stringify(CR_STORE || {}));
 
-            await window.fbSetDoc(window.fbDoc(window.fbDb, "portalData", "mainStore"), cleanData, { merge: true });
+            await window.fbSetDoc(window.fbDoc(window.fbDb, "portalData", "mainStore"), {
+                live: safeLive,
+                results: safeResults,
+                courses: safeCourses
+            }, { merge: false });
+
             alert("Data successfully saved to Firebase!");
         } else {
             alert("Firebase DB error. Check console.");
