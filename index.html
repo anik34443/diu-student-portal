@@ -204,9 +204,20 @@ function loadCloudData(){
             unsubscribeCloud = window.fbOnSnapshot(window.fbDoc(window.fbDb, "portalData", "mainStore"), function(docSnap){
                 if(docSnap.exists()){
                     var cloudData = docSnap.data();
-                    if(cloudData.live) LV_STORE = cloudData.live;
-                    if(cloudData.results) RS = cloudData.results;
-                    if(cloudData.courses) CR_STORE = cloudData.courses;
+                    // ফায়ারবেস থেকে JSON স্ট্রিং আকারে আসলে সেগুলোকে পার্স করে নেওয়া
+                    if(cloudData.payload){
+                        try {
+                            var parsed = JSON.parse(cloudData.payload);
+                            if(parsed.live) LV_STORE = parsed.live;
+                            if(parsed.results) RS = parsed.results;
+                            if(parsed.courses) CR_STORE = parsed.courses;
+                        } catch(err) {}
+                    } else {
+                        // পুরনো ডেটার জন্য ব্যাকওয়ার্ড কম্পাটিবিলিটি
+                        if(cloudData.live) LV_STORE = cloudData.live;
+                        if(cloudData.results) RS = cloudData.results;
+                        if(cloudData.courses) CR_STORE = cloudData.courses;
+                    }
                     render();
                     rsPaint(true);
                 }
@@ -217,18 +228,21 @@ function loadCloudData(){
     }catch(e){console.log('Cloud load error', e);}
 }
 
-// ফায়ারবেসের নেস্টেড অ্যারে এরর সলভের জন্য নিরাপদ ক্লাউড সিঙ্ক
+// ১০০% ফুলপ্রুফ সলিউশন: সব ডেটাকে স্ট্রিংify করে ফায়ারবেসে পাঠানো যাতে নেস্টেড অ্যারের কোনো চান্সই না থাকে
 async function syncToCloud(){
     try{
         if(window.fbDb && window.fbDoc && window.fbSetDoc){
-            var safeLive = JSON.parse(JSON.stringify(LV_STORE || {}));
-            var safeResults = JSON.parse(JSON.stringify(RS || {}));
-            var safeCourses = JSON.parse(JSON.stringify(CR_STORE || {}));
+            var rawBundle = {
+                live: LV_STORE,
+                results: RS,
+                courses: CR_STORE
+            };
+
+            // সম্পূর্ণ ডেটাকে একটি ফ্ল্যাট JSON স্ট্রিং এ রূপান্তর করা হলো (Nested Array Error চিরতরে দূর করার জন্য)
+            var safePayload = JSON.stringify(rawBundle);
 
             await window.fbSetDoc(window.fbDoc(window.fbDb, "portalData", "mainStore"), {
-                live: safeLive,
-                results: safeResults,
-                courses: safeCourses
+                payload: safePayload
             }, { merge: false });
 
             alert("Data successfully saved to Firebase!");
