@@ -142,6 +142,8 @@ body.open #side{transform:none}body.open #ov{display:block}
   window.fbGetDoc = getDoc;
   window.fbSetDoc = setDoc;
   window.fbOnSnapshot = onSnapshot;
+  window.fbReady = true;
+  window.dispatchEvent(new Event('fbready'));
 </script>
 
 <script>
@@ -197,24 +199,27 @@ function crSave(){
 
 var unsubscribeCloud = null;
 
-// ক্লাউড ডেটা সিঙ্ক ও লোডার
 function loadCloudData(){
+    if(!window.fbReady){
+        window.addEventListener('fbready', function(){ loadCloudData(); }, { once: true });
+        return;
+    }
     try{
         if(window.fbDb && window.fbOnSnapshot){
             if(unsubscribeCloud) unsubscribeCloud();
             unsubscribeCloud = window.fbOnSnapshot(window.fbDoc(window.fbDb, "portalData", "mainStore"), function(docSnap){
                 if(docSnap.exists()){
                     var cloudData = docSnap.data();
-                    if(cloudData.payload){
+                    if(cloudData && cloudData.payload){
                         try {
                             var parsed = JSON.parse(cloudData.payload);
-                            if(parsed.live) LV_STORE = parsed.live;
-                            if(parsed.results) RS = parsed.results;
-                            if(parsed.courses) CR_STORE = parsed.courses;
+                            if(parsed.live) { LV_STORE = parsed.live; lvSave(); }
+                            if(parsed.results) { RS = parsed.results; rsSave(); }
+                            if(parsed.courses) { CR_STORE = parsed.courses; crSave(); }
+                            render();
+                            rsPaint(true);
                         } catch(err) {}
                     }
-                    render();
-                    rsPaint(true);
                 }
             }, function(e){
                 console.log('Realtime listener error', e);
@@ -223,7 +228,6 @@ function loadCloudData(){
     }catch(e){console.log('Cloud load error', e);}
 }
 
-// ফায়ারবেসে ডেটা সেভ করার ফাংশন
 async function syncToCloud(){
     try{
         if(window.fbDb && window.fbDoc && window.fbSetDoc){
@@ -239,8 +243,10 @@ async function syncToCloud(){
                 payload: safePayload
             }, { merge: false });
 
+            // লোকাল স্টোরেজ আপডেট
+            lvSave(); rsSave(); crSave();
+
             alert("Data successfully saved to Firebase!");
-            loadCloudData();
         } else {
             alert("Firebase DB error. Check console.");
         }
@@ -250,6 +256,10 @@ async function syncToCloud(){
     }
 }
 
+/* --- Load cached data from localStorage on startup (before cloud arrives) --- */
+(function(){
+    try{ var a=localStorage.getItem(CR_KEY); if(a) CR_STORE=JSON.parse(a); }catch(e){}
+})();
 function crCur(){
     if(!CR_STORE.sems || !CR_STORE.sems.length) CR_STORE = getDefRegCourses();
     if(CR_STORE.sel < 0 || CR_STORE.sel >= CR_STORE.sems.length) CR_STORE.sel = 0;
@@ -375,6 +385,9 @@ function lvSave(){
     try{ localStorage.setItem(LV_KEY, JSON.stringify(LV_STORE)); }catch(e){}
 }
 
+(function(){
+    try{ var a=localStorage.getItem(LV_KEY); if(a) LV_STORE=JSON.parse(a); }catch(e){}
+})();
 function lvCur(){
     if(!LV_STORE.sems || !LV_STORE.sems.length) LV_STORE = getDefLiveStore();
     if(LV_STORE.sel < 0 || LV_STORE.sel >= LV_STORE.sems.length) LV_STORE.sel = 0;
@@ -483,7 +496,7 @@ function lvEdRender(){
 
 /* --- ACADEMIC RESULTS STORE & EDIT LOGIC --- */
 var RS_KEY='diu_results_v5', RS_ED=false;
-var IS_LOGGED_IN = (localStorage.getItem('diu_is_logged_in') === '1');
+var IS_LOGGED_IN = (sessionStorage.getItem('diu_is_logged_in') === '1');
 
 function getDefData() {
     return {
@@ -508,6 +521,9 @@ var RS = getDefData();
 function rsSave(){
     try { localStorage.setItem(RS_KEY, JSON.stringify(RS)); } catch(e){}
 }
+(function(){
+    try{ var a=localStorage.getItem(RS_KEY); if(a) RS=JSON.parse(a); }catch(e){}
+})();
 function rsEsc(s){
     return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
@@ -745,12 +761,11 @@ function doLogin(){
     var pwv = document.getElementById('siPw').value||'';
     if(idv === CREDS.id && pwv === CREDS.pw){
         IS_LOGGED_IN = true;
-        try{ localStorage.setItem('diu_is_logged_in', '1'); }catch(e){}
+        try{ sessionStorage.setItem('diu_is_logged_in', '1'); }catch(e){}
         
         document.getElementById('authwrap').style.display = 'none';
         document.getElementById('appwrap').style.display = '';
         
-        // লগইন সফল হওয়ার পরেই কেবল অ্যাপ ইনিট ও ক্লাউড ডাটা লোড হবে
         if(!APP_READY){ 
             initApp(); 
             APP_READY = true; 
@@ -764,7 +779,7 @@ function doLogin(){
 
 function doLogout(){
     IS_LOGGED_IN = false;
-    try{ localStorage.removeItem('diu_is_logged_in'); }catch(e){}
+    try{ sessionStorage.removeItem('diu_is_logged_in'); }catch(e){}
     
     if(unsubscribeCloud) {
         unsubscribeCloud();
@@ -808,7 +823,7 @@ function initApp(){
         });
     });
     
-    var tgEl = document.getElementById('tg'); if(tgEl) tgEl.onclick = function()...{ document.body.classList.toggle('open'); };
+    var tgEl = document.getElementById('tg'); if(tgEl) tgEl.onclick = function(){ document.body.classList.toggle('open'); };
     var ovEl = document.getElementById('ov'); if(ovEl) ovEl.onclick = function(){ document.body.classList.remove('open'); };
     
     window.addEventListener('hashchange', function(){
@@ -818,7 +833,7 @@ function initApp(){
     });
 }
 
-// ইনিশিয়াল চেক (লগইন করা থাকলে ড্যাশবোর্ডে যাবে, না থাকলে ল্যান্ডিং পেজে আটকে থাকবে না)
+// ইনিশিয়াল লোড চেক
 if(IS_LOGGED_IN){
     document.getElementById('authwrap').style.display = 'none';
     document.getElementById('appwrap').style.display = '';
