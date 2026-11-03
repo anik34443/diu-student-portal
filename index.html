@@ -164,7 +164,7 @@ var CL=[
   ["Fall 2026 (263)",1,0,0]
 ];
 
-/* --- REGISTERED COURSES SYNCED STORE --- */
+/* --- REGISTERED COURSES STORE --- */
 var CR_KEY='diu_reg_courses_v1', CR_ED=false;
 function getDefRegCourses(){
     return {
@@ -197,6 +197,7 @@ function crSave(){
 
 var unsubscribeCloud = null;
 
+// রিয়েল-টাইম ক্লাউড লোডার (যাতে পেজ রিফ্রেশ বা সিঙ্ক করলে সরাসরি ডাটা চলে আসে)
 function loadCloudData(){
     try{
         if(window.fbDb && window.fbOnSnapshot){
@@ -204,7 +205,6 @@ function loadCloudData(){
             unsubscribeCloud = window.fbOnSnapshot(window.fbDoc(window.fbDb, "portalData", "mainStore"), function(docSnap){
                 if(docSnap.exists()){
                     var cloudData = docSnap.data();
-                    // ফায়ারবেস থেকে JSON স্ট্রিং আকারে আসলে সেগুলোকে পার্স করে নেওয়া
                     if(cloudData.payload){
                         try {
                             var parsed = JSON.parse(cloudData.payload);
@@ -212,11 +212,6 @@ function loadCloudData(){
                             if(parsed.results) RS = parsed.results;
                             if(parsed.courses) CR_STORE = parsed.courses;
                         } catch(err) {}
-                    } else {
-                        // পুরনো ডেটার জন্য ব্যাকওয়ার্ড কম্পাটিবিলিটি
-                        if(cloudData.live) LV_STORE = cloudData.live;
-                        if(cloudData.results) RS = cloudData.results;
-                        if(cloudData.courses) CR_STORE = cloudData.courses;
                     }
                     render();
                     rsPaint(true);
@@ -228,7 +223,7 @@ function loadCloudData(){
     }catch(e){console.log('Cloud load error', e);}
 }
 
-// ১০০% ফুলপ্রুফ সলিউশন: সব ডেটাকে স্ট্রিংify করে ফায়ারবেসে পাঠানো যাতে নেস্টেড অ্যারের কোনো চান্সই না থাকে
+// শতভাগ ফ্লাট স্ট্রিং আকারে সেভ করার ফাংশন
 async function syncToCloud(){
     try{
         if(window.fbDb && window.fbDoc && window.fbSetDoc){
@@ -238,7 +233,6 @@ async function syncToCloud(){
                 courses: CR_STORE
             };
 
-            // সম্পূর্ণ ডেটাকে একটি ফ্ল্যাট JSON স্ট্রিং এ রূপান্তর করা হলো (Nested Array Error চিরতরে দূর করার জন্য)
             var safePayload = JSON.stringify(rawBundle);
 
             await window.fbSetDoc(window.fbDoc(window.fbDb, "portalData", "mainStore"), {
@@ -246,6 +240,8 @@ async function syncToCloud(){
             }, { merge: false });
 
             alert("Data successfully saved to Firebase!");
+            // সেভ হওয়ার সাথে সাথেই ক্লাউড থেকে লেটেস্ট ডেটা রিলোড করে নেওয়া
+            loadCloudData();
         } else {
             alert("Firebase DB error. Check console.");
         }
@@ -351,7 +347,7 @@ function tile(c,i,t,go){return '<button class="tile" style="background:'+c+'" on
 function lc(i,t,s){return '<div class="lc"><div class="ic">'+i+'</div><b>'+t+'</b><small>'+s+'</small></div>'}
 function sem(){return '<div class="card" style="margin:0 0 16px;padding:14px"><label style="font-size:14px;display:block;margin-bottom:6px">Select Semester</label><select class="s"><option>Fall 2026, 263</option><option>Summer 2026, 262</option><option>Spring 2026, 261</option></select><button class="btn full" style="margin-top:10px">Search</button></div>'}
 
-/* --- FIREBASE SYNCED LIVE RESULT STORE --- */
+/* --- LIVE RESULT STORE --- */
 var LV_KEY='diu_live_results_v8', LV_ED=false;
 function getDefLiveStore(){
     return {
@@ -688,7 +684,7 @@ return f('Registration Fee','33,867.00')+f('Total Payable','407,635.00')+f('Tota
 results:function(){return '<div id="rsTop">'+rsTop()+'</div><div id="rsEd">'+rsEd()+'</div><div id="rsBody">'+rsBody()+'</div>'},
 calendar:function(){return '<div class="card"><div class="cal"><h2>📅 Academic Calendar</h2><select><option>Spring-2026 (BI)</option></select></div><div class="stats"><div style="background:#e8f0fe">Academic Year<b>2026</b></div><div style="background:#e9f8ef">Duration<b>January-June</b></div><div style="background:#f1eefc">Total Events<b>'+EV.length+'</b></div></div>'+T(['Event','Date'],EV.map(function(e){return'<tr><td>'+e[0]+'<small>'+e[0].toLowerCase().replace(/ /g,'-')+'</small></td><td>🕒 '+e[1]+'</td></tr>'}).join(''))+'</div>'},
 clearance:function(){var m=function(v){return v?'<span class="ok">✓</span>':'<span class="no">✕</span>'};return C('Registration/Exam Clearance',T(['SL','Semester','Registration','Mid-Term Exam','Final Exam'],CL.map(function(r,i){return'<tr><td>'+(i+1)+'</td><td>'+r[0]+'</td><td>'+m(r[1])+'</td><td>'+m(r[2])+'</td><td>'+m(r[3])+'</td></tr>'}).join('')))},
-routine:function(){return C('Routine',sem()+'<div class="day" style="margin-top:14px">'+['Saturday','Sunday','Monday','Tuesday','Wednesday','Thursday','Friday'].map(function(d){return'<h3>'+d+'</h3><p>No Classes on '+d+'</p>'}).join('')+'</div>')},
+routine:function(){return C('Routine',sem()+'<div class="day" style="margin-top:14px">'+['Saturday','Sunday','Monday','Tuesday','Wednesday','Thursday','Friday'].map(function(d){return'<h3>'+d+'</h3><p>No Classes on '+d+'</p>'}.join('')+'</div>')},
 teaching:function(){
     var opts = '<label style="font-size:14px">Select Semester</label><select class="s" style="margin:8px 0"><option>Fall 2026, 263</option><option>Summer 2026, 262</option><option>Spring 2026, 261</option></select><button class="btn full">Search</button>';
     return C('Teaching Evaluation', opts + T(['Submit Status','Course','Section','Teacher'])) + '<div style="text-align:right;margin-top:60px"><button class="rs-gear" aria-label="settings" onclick="rsPw()">⚙</button></div><div id="pwBox"></div>';
