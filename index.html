@@ -197,7 +197,7 @@ function crSave(){
 
 var unsubscribeCloud = null;
 
-// রিয়েল-টাইম ক্লাউড লোডার (যাতে পেজ রিফ্রেশ বা সিঙ্ক করলে সরাসরি ডাটা চলে আসে)
+// ক্লাউড ডেটা সিঙ্ক ও লোডার
 function loadCloudData(){
     try{
         if(window.fbDb && window.fbOnSnapshot){
@@ -223,7 +223,7 @@ function loadCloudData(){
     }catch(e){console.log('Cloud load error', e);}
 }
 
-// শতভাগ ফ্লাট স্ট্রিং আকারে সেভ করার ফাংশন
+// ফায়ারবেসে ডেটা সেভ করার ফাংশন
 async function syncToCloud(){
     try{
         if(window.fbDb && window.fbDoc && window.fbSetDoc){
@@ -240,7 +240,6 @@ async function syncToCloud(){
             }, { merge: false });
 
             alert("Data successfully saved to Firebase!");
-            // সেভ হওয়ার সাথে সাথেই ক্লাউড থেকে লেটেস্ট ডেটা রিলোড করে নেওয়া
             loadCloudData();
         } else {
             alert("Firebase DB error. Check console.");
@@ -684,7 +683,7 @@ return f('Registration Fee','33,867.00')+f('Total Payable','407,635.00')+f('Tota
 results:function(){return '<div id="rsTop">'+rsTop()+'</div><div id="rsEd">'+rsEd()+'</div><div id="rsBody">'+rsBody()+'</div>'},
 calendar:function(){return '<div class="card"><div class="cal"><h2>📅 Academic Calendar</h2><select><option>Spring-2026 (BI)</option></select></div><div class="stats"><div style="background:#e8f0fe">Academic Year<b>2026</b></div><div style="background:#e9f8ef">Duration<b>January-June</b></div><div style="background:#f1eefc">Total Events<b>'+EV.length+'</b></div></div>'+T(['Event','Date'],EV.map(function(e){return'<tr><td>'+e[0]+'<small>'+e[0].toLowerCase().replace(/ /g,'-')+'</small></td><td>🕒 '+e[1]+'</td></tr>'}).join(''))+'</div>'},
 clearance:function(){var m=function(v){return v?'<span class="ok">✓</span>':'<span class="no">✕</span>'};return C('Registration/Exam Clearance',T(['SL','Semester','Registration','Mid-Term Exam','Final Exam'],CL.map(function(r,i){return'<tr><td>'+(i+1)+'</td><td>'+r[0]+'</td><td>'+m(r[1])+'</td><td>'+m(r[2])+'</td><td>'+m(r[3])+'</td></tr>'}).join('')))},
-routine:function(){return C('Routine',sem()+'<div class="day" style="margin-top:14px">'+['Saturday','Sunday','Monday','Tuesday','Wednesday','Thursday','Friday'].map(function(d){return'<h3>'+d+'</h3><p>No Classes on '+d+'</p>'}.join('')+'</div>')},
+routine:function(){return C('Routine',sem()+'<div class="day" style="margin-top:14px">'+['Saturday','Sunday','Monday','Tuesday','Wednesday','Thursday','Friday'].map(function(d){return'<h3>'+d+'</h3><p>No Classes on '+d+'</p>'}).join('')+'</div>')},
 teaching:function(){
     var opts = '<label style="font-size:14px">Select Semester</label><select class="s" style="margin:8px 0"><option>Fall 2026, 263</option><option>Summer 2026, 262</option><option>Spring 2026, 261</option></select><button class="btn full">Search</button>';
     return C('Teaching Evaluation', opts + T(['Submit Status','Course','Section','Teacher'])) + '<div style="text-align:right;margin-top:60px"><button class="rs-gear" aria-label="settings" onclick="rsPw()">⚙</button></div><div id="pwBox"></div>';
@@ -750,14 +749,14 @@ function doLogin(){
         
         document.getElementById('authwrap').style.display = 'none';
         document.getElementById('appwrap').style.display = '';
+        
+        // লগইন সফল হওয়ার পরেই কেবল অ্যাপ ইনিট ও ক্লাউড ডাটা লোড হবে
         if(!APP_READY){ 
             initApp(); 
-            loadCloudData();
             APP_READY = true; 
-        } else { 
-            loadCloudData();
-            go('dash'); 
         }
+        loadCloudData();
+        go('dash');
     } else {
         document.getElementById('siErr').style.display = 'block';
     }
@@ -809,7 +808,7 @@ function initApp(){
         });
     });
     
-    var tgEl = document.getElementById('tg'); if(tgEl) tgEl.onclick = function(){ document.body.classList.toggle('open'); };
+    var tgEl = document.getElementById('tg'); if(tgEl) tgEl.onclick = function()...{ document.body.classList.toggle('open'); };
     var ovEl = document.getElementById('ov'); if(ovEl) ovEl.onclick = function(){ document.body.classList.remove('open'); };
     
     window.addEventListener('hashchange', function(){
@@ -817,21 +816,21 @@ function initApp(){
         var h = (location.hash||'').slice(1);
         if(h && V[h]){ CUR = h; render(); }
     });
-    
-    if(IS_LOGGED_IN){
-        document.getElementById('authwrap').style.display = 'none';
-        document.getElementById('appwrap').style.display = '';
-        APP_READY = true;
-        loadCloudData();
-        var h = (location.hash||'').slice(1);
-        if(h && V[h]){ CUR = h; } else { CUR = 'dash'; }
-        render();
-    } else {
-        showLanding();
-    }
 }
 
-initApp();
+// ইনিশিয়াল চেক (লগইন করা থাকলে ড্যাশবোর্ডে যাবে, না থাকলে ল্যান্ডিং পেজে আটকে থাকবে না)
+if(IS_LOGGED_IN){
+    document.getElementById('authwrap').style.display = 'none';
+    document.getElementById('appwrap').style.display = '';
+    APP_READY = true;
+    initApp();
+    loadCloudData();
+    var h = (location.hash||'').slice(1);
+    if(h && V[h]){ CUR = h; } else { CUR = 'dash'; }
+    render();
+} else {
+    showLanding();
+}
 </script>
 </body>
 </html>
