@@ -168,7 +168,7 @@ var CL=[
 var CR_KEY='diu_reg_courses_v1', CR_ED=false;
 function getDefRegCourses(){
     return {
-        sel: 4, // Default Summer 2026, 262
+        sel: 4, 
         sems: [
             { name: 'Spring 2025 (251)', courses: [] },
             { name: 'Summer 2025 (252)', courses: [] },
@@ -463,7 +463,10 @@ function lvEdRender(){
 }
 
 /* --- ACADEMIC RESULTS STORE & EDIT LOGIC --- */
-var RS_KEY='diu_results_v5', RS_ED=false, IS_LOGGED_IN=false;
+var RS_KEY='diu_results_v5', RS_ED=false;
+// ব্রাউজার রিফ্রেশে লগইন স্ট্যাটাস ধরে রাখার জন্য লোকালস্টোরেজ চেক করা হচ্ছে
+var IS_LOGGED_IN = (localStorage.getItem('diu_is_logged_in') === '1');
+
 function getDefData() {
     return {
         sel: 0,
@@ -725,6 +728,8 @@ function doLogin(){
     var pwv = document.getElementById('siPw').value||'';
     if(idv === CREDS.id && pwv === CREDS.pw){
         IS_LOGGED_IN = true;
+        try{ localStorage.setItem('diu_is_logged_in', '1'); }catch(e){}
+        
         document.getElementById('authwrap').style.display = 'none';
         document.getElementById('appwrap').style.display = '';
         if(!APP_READY){ 
@@ -742,6 +747,8 @@ function doLogin(){
 
 function doLogout(){
     IS_LOGGED_IN = false;
+    try{ localStorage.removeItem('diu_is_logged_in'); }catch(e){}
+    
     if(unsubscribeCloud) {
         unsubscribeCloud();
         unsubscribeCloud = null;
@@ -788,10 +795,23 @@ function initApp(){
         if(h && h !== CUR){ CUR = h; render(); }
     });
     
-    go('dash');
+    // পেজ লোড হওয়ার সময় যদি আগে থেকেই লগইন করা থাকে তবে সরাসরি ড্যাশবোর্ড বা আগের পেজে নিয়ে যাবে
+    if(IS_LOGGED_IN){
+        document.getElementById('authwrap').style.display = 'none';
+        document.getElementById('appwrap').style.display = '';
+        initApp();
+        loadCloudData();
+        APP_READY = true;
+        var h = (location.hash||'').slice(1);
+        if(h && V[h]) CUR = h;
+        render();
+    } else {
+        showLanding();
+    }
 }
 
-showLanding();
+// ইনিশিয়ালাইজেশন কল
+initApp();
 </script>
 </body>
 </html>
