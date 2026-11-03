@@ -153,7 +153,164 @@ var MENU=[
 ["notice","","Notice Board"],["facil","","Facilities"],["logout","","Logout"]];
 var TITLES={};
 var EV=[["Advising & Registration","1 January – 7 January 2026"],["Orientation Program (Newly Admitted Students)","8 January 2026"],["Classes Start","10 January 2026"],["Eid-Al-Fitr Vacation*","19 March–23 March 2026"],["Mid-Examination","28 March–10 April 2026"],["Eid-Al-Adha Vacation*","26 May–31 May 2026"],["Preparatory Leave","5 June–7 June 2026"],["Final Examination","8 June–23 June 2026"],["Last Date of Grade Submission","27 June 2026"],["Publication of Semester Results","28 June 2026"],["Semester Break","28 June–30 June 2026"],["Advising & Registration of Next Semester","1 July–9 July 2026"],["Classes Start of Next Semester","11 July 2026"]];
-var CL=[["Summer 2025 (252)",0,0,1],["Fall 2025 (253)",1,0,0],["Spring 2026 (261)",1,0,1],["Summer 2026 (262)",1,0,0]];
+
+var CL=[
+  ["Spring 2025 (251)",1,1,1],
+  ["Summer 2025 (252)",1,1,1],
+  ["Fall 2025 (253)",1,1,1],
+  ["Spring 2026 (261)",1,1,1],
+  ["Summer 2026 (262)",1,0,0],
+  ["Fall 2026 (263)",1,0,0]
+];
+
+/* --- REGISTERED COURSES SYNCED STORE --- */
+var CR_KEY='diu_reg_courses_v1', CR_ED=false;
+function getDefRegCourses(){
+    return {
+        sel: 4, // Default Summer 2026, 262
+        sems: [
+            { name: 'Spring 2025 (251)', courses: [] },
+            { name: 'Summer 2025 (252)', courses: [] },
+            { name: 'Fall 2025 (253)', courses: [] },
+            { name: 'Spring 2026 (261)', courses: [] },
+            {
+                name: 'Summer 2026, 262',
+                courses: [
+                    ["SE 133","Software Development Capstone Project","3","RETAKE","45_L1 (Self Study)","Dr. Md. Fazla Elahe"],
+                    ["SE 223","Database System","3","REGULAR","45_M (Self Study)","Tapushe Rabaya Toma"],
+                    ["SE 224","Database System Lab","1","REGULAR","45_C2","Nusrat Jahan"],
+                    ["SE 222","Computer Architecture","3","REGULAR","45_L","Engr. Fayazunnesa Chowdhury"],
+                    ["AOL 101","Art of Living","3","REGULAR","45_B","Ms. Jakia Khanom"]
+                ]
+            },
+            { name: 'Fall 2026 (263)', courses: [] }
+        ]
+    };
+}
+
+var CR_STORE = getDefRegCourses();
+
+function crSave(){
+    try{ localStorage.setItem(CR_KEY, JSON.stringify(CR_STORE)); }catch(e){}
+    syncToCloud();
+}
+
+async function loadCloudData(){
+    try{
+        if(window.fbDb){
+            var docSnap = await window.fbGetDoc(window.fbDoc(window.fbDb, "portalData", "mainStore"));
+            if(docSnap.exists()){
+                var cloudData = docSnap.data();
+                if(cloudData.live) LV_STORE = cloudData.live;
+                if(cloudData.results) RS = cloudData.results;
+                if(cloudData.courses) CR_STORE = cloudData.courses;
+                render();
+                rsPaint(true);
+            }
+        }
+    }catch(e){console.log('Cloud load fallback to local', e);}
+}
+
+async function syncToCloud(){
+    try{
+        if(window.fbDb){
+            await window.fbSetDoc(window.fbDoc(window.fbDb, "portalData", "mainStore"), {
+                live: LV_STORE,
+                results: RS,
+                courses: CR_STORE
+            }, { merge: true });
+        }
+    }catch(e){console.log('Cloud save error', e);}
+}
+
+function crCur(){
+    if(!CR_STORE.sems || !CR_STORE.sems.length) CR_STORE = getDefRegCourses();
+    if(CR_STORE.sel < 0 || CR_STORE.sel >= CR_STORE.sems.length) CR_STORE.sel = 0;
+    return CR_STORE.sems[CR_STORE.sel];
+}
+function crCell(i, j, el){
+    var cur = crCur();
+    if(cur.courses && cur.courses[i]){
+        cur.courses[i][j] = el.value;
+        crSave();
+    }
+}
+function crAddRow(){
+    var cur = crCur();
+    if(!cur.courses) cur.courses = [];
+    cur.courses.push(["NEW CODE","New Course Title","3","REGULAR","45_A","Teacher Name"]);
+    crSave();
+    if(CUR==='course') render();
+}
+function crDelRow(i){
+    var cur = crCur();
+    if(cur.courses && cur.courses[i]){
+        cur.courses.splice(i,1);
+        crSave();
+        if(CUR==='course') render();
+    }
+}
+function crSetName(el){
+    var cur = crCur();
+    cur.name = el.value;
+    crSave();
+    var selEl = document.getElementById('crSemSel');
+    if(selEl && selEl.options[selEl.selectedIndex]){
+        selEl.options[selEl.selectedIndex].text = el.value;
+    }
+}
+function crAddSem(){
+    var el = document.getElementById('crNewSem'), n = el && el.value ? el.value.trim() : '';
+    if(!n){ if(el) el.focus(); return; }
+    CR_STORE.sems.push({ name: n, courses: [] });
+    CR_STORE.sel = CR_STORE.sems.length - 1;
+    crSave();
+    if(el) el.value = '';
+    if(CUR==='course') render();
+}
+function crDelSem(){
+    if(CR_STORE.sems.length < 2){ alert('At least one semester is required.'); return; }
+    if(!confirm('Delete "'+crCur().name+'"?')) return;
+    CR_STORE.sems.splice(CR_STORE.sel, 1);
+    CR_STORE.sel = 0;
+    crSave();
+    if(CUR==='course') render();
+}
+function crSearch(){
+    var selEl = document.getElementById('crSemSel');
+    if(selEl){
+        var v = parseInt(selEl.value, 10);
+        if(!isNaN(v) && v >= 0 && v < CR_STORE.sems.length){
+            CR_STORE.sel = v;
+            crSave();
+        }
+    }
+    if(CUR==='course') render();
+}
+
+function crEdRender(){
+    if(!CR_ED) return '';
+    var cur = crCur();
+    var rows = (cur.courses || []).map(function(d, i){
+        return '<tr>'+
+        '<td><b>#'+(i+1)+'</b></td>'+
+        '<td><input class="rs-in" value="'+rsEsc(d[0])+'" placeholder="Code" oninput="crCell('+i+',0,this)"></td>'+
+        '<td><input class="rs-in" value="'+rsEsc(d[1])+'" placeholder="Title" oninput="crCell('+i+',1,this)"></td>'+
+        '<td><input class="rs-in" value="'+rsEsc(d[2])+'" placeholder="Credit" oninput="crCell('+i+',2,this)"></td>'+
+        '<td><input class="rs-in" value="'+rsEsc(d[3])+'" placeholder="Type" oninput="crCell('+i+',3,this)"></td>'+
+        '<td><input class="rs-in" value="'+rsEsc(d[4])+'" placeholder="Section" oninput="crCell('+i+',4,this)"></td>'+
+        '<td><input class="rs-in" value="'+rsEsc(d[5])+'" placeholder="Teacher" oninput="crCell('+i+',5,this)"></td>'+
+        '<td><button class="rs-x" onclick="crDelRow('+i+')">✕</button></td>'+
+        '</tr>';
+    }).join('');
+
+    return '<div class="card rs-ed"><h2>Review – Edit Registered Courses</h2>'+
+    '<div class="fld"><label>New semester name</label><input class="rs-in" id="crNewSem" placeholder="e.g. Spring 2027, 271"></div>'+
+    '<div class="rs-btns"><button class="btn" onclick="crAddSem()">＋ Add Semester</button><button class="rs-x" onclick="crDelSem()">Delete this semester</button></div>'+
+    '<div class="fld"><label>Semester name (selected)</label><input class="rs-in" value="'+rsEsc(cur.name)+'" oninput="crSetName(this)"></div>'+
+    '<div class="tw"><table><thead><tr><th>SL</th><th>Code</th><th>Title</th><th>Cr</th><th>Type</th><th>Sec</th><th>Teacher</th><th>Action</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
+    '<div class="rs-btns" style="margin-top:12px"><button class="btn" onclick="crAddRow()">＋ Add Course</button><button class="btn" style="background:#198754" onclick="CR_ED=false;render()">Done</button></div></div>';
+}
 
 function T(h,rows,empty){return '<div class="tw"><table><thead><tr>'+h.map(function(x){return'<th>'+x+'</th>'}).join('')+'</tr></thead><tbody>'+(rows||'')+'</tbody></table>'+(empty?'<div class="empty">'+empty+'</div>':'')+'</div>'}
 function C(t,b){return '<div class="card">'+(t?'<h2>'+t+'</h2>':'')+b+'</div>'}
@@ -187,35 +344,9 @@ function getDefLiveStore(){
 
 var LV_STORE = getDefLiveStore();
 
-async function loadCloudData(){
-    try{
-        if(window.fbDb){
-            var docSnap = await window.fbGetDoc(window.fbDoc(window.fbDb, "portalData", "mainStore"));
-            if(docSnap.exists()){
-                var cloudData = docSnap.data();
-                if(cloudData.live) LV_STORE = cloudData.live;
-                if(cloudData.results) RS = cloudData.results;
-                render();
-                rsPaint(true);
-            }
-        }
-    }catch(e){console.log('Cloud load fallback to local', e);}
-}
-
 function lvSave(){
     try{ localStorage.setItem(LV_KEY, JSON.stringify(LV_STORE)); }catch(e){}
     syncToCloud();
-}
-
-async function syncToCloud(){
-    try{
-        if(window.fbDb){
-            await window.fbSetDoc(window.fbDoc(window.fbDb, "portalData", "mainStore"), {
-                live: LV_STORE,
-                results: RS
-            }, { merge: true });
-        }
-    }catch(e){console.log('Cloud save error', e);}
 }
 
 function lvCur(){
@@ -426,7 +557,7 @@ function rsUnlock(){
     if(v === RS_PW){
         RS_UNL = true;
         try{ localStorage.setItem('diu_rs_unlock','1'); }catch(e){}
-        document.getElementById('pwBox').innerHTML='<div class="pw-ov"><div class="pw-box"><h3>Select Option to Edit</h3><div class="rs-btns" style="flex-direction:column;gap:10px"><button class="btn full" onclick="rsPwClose();go(\'results\');RS_ED=true;rsPaint(true)">✏️ Edit Academic Result</button><button class="btn full" style="background:#198754" onclick="rsPwClose();go(\'live\');LV_ED=true;render()">✏️ Edit Live Results</button><button class="btn full" style="background:#8a8fa8" onclick="rsPwClose()">Cancel</button></div></div></div>';
+        document.getElementById('pwBox').innerHTML='<div class="pw-ov"><div class="pw-box"><h3>Select Option to Edit</h3><div class="rs-btns" style="flex-direction:column;gap:10px"><button class="btn full" onclick="rsPwClose();go(\'results\');RS_ED=true;rsPaint(true)">✏️ Edit Academic Result</button><button class="btn full" style="background:#198754" onclick="rsPwClose();go(\'live\');LV_ED=true;render()">✏️ Edit Live Results</button><button class="btn full" style="background:#0d6efd" onclick="rsPwClose();go(\'course\');CR_ED=true;render()">✏️ Edit Registered Courses</button><button class="btn full" style="background:#8a8fa8" onclick="rsPwClose()">Cancel</button></div></div></div>';
     } else {
         var err = document.getElementById('pwErr');
         if(err) err.style.display = 'block';
@@ -505,6 +636,20 @@ live:function(){
     }).join('');
     
     return topHtml + lvEdRender() + C('Live Result Details', T(['Action','SL','Course Code','Course Title','Credit','Section','Teacher'],rows));
+},
+course:function(){
+    var cur = crCur();
+    var opts = CR_STORE.sems.map(function(x,i){
+        return '<option value="'+i+'"'+(i===CR_STORE.sel?' selected':'')+'>'+rsEsc(x.name)+'</option>';
+    }).join('');
+
+    var topHtml = '<div class="card"><div class="rs-title"><h2>Course Registration</h2></div><label class="rs-lbl">Search Semester</label><select class="rs-sel" id="crSemSel">'+opts+'</select><button class="btn full" onclick="crSearch()">Search</button></div>';
+
+    var rows = (cur.courses || []).map(function(d,i){
+        return '<tr><td>'+(i+1)+'</td><td>'+rsEsc(d[0])+'</td><td>'+rsEsc(d[1])+'</td><td>'+rsEsc(d[2])+'</td><td>'+rsEsc(d[3])+'</td><td>'+rsEsc(d[4])+'</td><td>'+rsEsc(d[5])+'</td></tr>';
+    }).join('');
+
+    return topHtml + crEdRender() + C('Registered Course', T(['SL','Course Code','Course Title','Credit','Type','Section','Teacher'], rows, (cur.courses && cur.courses.length ? '' : 'No courses registered for this semester.')));
 },
 ledger:function(){var f=function(t,v){return '<div class="fee"><div>'+t+'</div><div>'+v+'</div></div>'};
 return f('Registration Fee','33,867.00')+f('Total Payable','407,635.00')+f('Total Paid','327,315.00')+f('Total Due','80,320.00')+f('Total Other','2,400.00')+C('Payment Ledger','<label style="font-size:14px">Select Semester</label><select class="s" style="margin:8px 0"><option></option></select><button class="btn full">Search</button><div style="margin-top:14px">'+T(['SL','Transaction Date','Collected By','Head Description','Receivable','Paid','Other'])+'</div>')},
