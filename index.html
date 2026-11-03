@@ -122,7 +122,7 @@ body.open #side{transform:none}body.open #ov{display:block}
 <!-- Firebase SDK Integration -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
-  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
+  import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyAHa6RNJ5Mx1cMp2UnrEre-g7gKIH20In4",
@@ -141,6 +141,7 @@ body.open #side{transform:none}body.open #ov{display:block}
   window.fbDoc = doc;
   window.fbGetDoc = getDoc;
   window.fbSetDoc = setDoc;
+  window.fbOnSnapshot = onSnapshot;
 </script>
 
 <script>
@@ -195,20 +196,26 @@ function crSave(){
     syncToCloud();
 }
 
-async function loadCloudData(){
+var unsubscribeCloud = null;
+
+function loadCloudData(){
     try{
-        if(window.fbDb){
-            var docSnap = await window.fbGetDoc(window.fbDoc(window.fbDb, "portalData", "mainStore"));
-            if(docSnap.exists()){
-                var cloudData = docSnap.data();
-                if(cloudData.live) LV_STORE = cloudData.live;
-                if(cloudData.results) RS = cloudData.results;
-                if(cloudData.courses) CR_STORE = cloudData.courses;
-                render();
-                rsPaint(true);
-            }
+        if(window.fbDb && window.fbOnSnapshot){
+            if(unsubscribeCloud) unsubscribeCloud();
+            unsubscribeCloud = window.fbOnSnapshot(window.fbDoc(window.fbDb, "portalData", "mainStore"), function(docSnap){
+                if(docSnap.exists()){
+                    var cloudData = docSnap.data();
+                    if(cloudData.live) LV_STORE = cloudData.live;
+                    if(cloudData.results) RS = cloudData.results;
+                    if(cloudData.courses) CR_STORE = cloudData.courses;
+                    render();
+                    rsPaint(true);
+                }
+            }, function(e){
+                console.log('Realtime listener fallback/error', e);
+            });
         }
-    }catch(e){console.log('Cloud load fallback to local', e);}
+    }catch(e){console.log('Cloud load error', e);}
 }
 
 async function syncToCloud(){
@@ -735,6 +742,10 @@ function doLogin(){
 
 function doLogout(){
     IS_LOGGED_IN = false;
+    if(unsubscribeCloud) {
+        unsubscribeCloud();
+        unsubscribeCloud = null;
+    }
     document.getElementById('appwrap').style.display = 'none';
     document.getElementById('authwrap').style.display = '';
     showLanding();
