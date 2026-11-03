@@ -220,11 +220,14 @@ function loadCloudData(){
 async function syncToCloud(){
     try{
         if(window.fbDb && window.fbDoc && window.fbSetDoc){
-            await window.fbSetDoc(window.fbDoc(window.fbDb, "portalData", "mainStore"), {
+            // নেস্টেড অ্যারে বা কাস্টম অবজেক্টকে ফায়ারবেস ফ্রেন্ডলি প্লেন অবজেক্টে রূপান্তর করা হচ্ছে
+            var cleanData = JSON.parse(JSON.stringify({
                 live: LV_STORE,
                 results: RS,
                 courses: CR_STORE
-            }, { merge: true });
+            }));
+
+            await window.fbSetDoc(window.fbDoc(window.fbDb, "portalData", "mainStore"), cleanData, { merge: true });
             alert("Data successfully saved to Firebase!");
         } else {
             alert("Firebase DB error. Check console.");
