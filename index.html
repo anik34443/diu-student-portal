@@ -464,7 +464,6 @@ function lvEdRender(){
 
 /* --- ACADEMIC RESULTS STORE & EDIT LOGIC --- */
 var RS_KEY='diu_results_v5', RS_ED=false;
-// ব্রাউজার রিফ্রেশে লগইন স্ট্যাটাস ধরে রাখার জন্য লোকালস্টোরেজ চেক করা হচ্ছে
 var IS_LOGGED_IN = (localStorage.getItem('diu_is_logged_in') === '1');
 
 function getDefData() {
@@ -692,7 +691,7 @@ function render(){
     var f = V[id];
     var appEl = document.getElementById('app');
     if(appEl) appEl.innerHTML = f ? f() : C(TITLES[id]||'Section',E('Data not Found!!'));
-    document.querySelectorAll('#side a').forEach(function(a){ a.classList.toggle('on', a.dataset.id === id); });
+    document.querySelectorAll('#side a[data-id]').forEach(function(a){ a.classList.toggle('on', a.dataset.id === id); });
     document.body.classList.remove('open');
     window.scrollTo(0,0);
 }
@@ -767,7 +766,7 @@ function initApp(){
     var s = '<div class="logo"><img src="logo.png" alt="DIU Logo"></div>';
     MENU.forEach(function(m,i){
         if(m[0]==='g'){
-            s += '<a data-g="'+i+'">'+m[1]+' '+m[2]+'<span class="arr">›</span></a><div class="sm" id="g'+i+'">'+m[3].map(function(x){ TITLES[x[0]]=x[1]; return '<a data-id="'+x[0]+'" href="#'+x[0]+'">'+x[1]+'</a>'; }).join('')+'</div>';
+            s += '<a data-g="'+i+'" style="cursor:pointer">'+m[1]+' '+m[2]+'<span class="arr">›</span></a><div class="sm" id="g'+i+'">'+m[3].map(function(x){ TITLES[x[0]]=x[1]; return '<a data-id="'+x[0]+'" href="#'+x[0]+'">'+x[1]+'</a>'; }).join('')+'</div>';
         } else {
             TITLES[m[0]] = m[2];
             s += '<a data-id="'+m[0]+'" href="#'+m[0]+'">'+m[1]+' '+m[2]+'</a>';
@@ -778,12 +777,18 @@ function initApp(){
     document.querySelectorAll('#side a[data-id]').forEach(function(a){
         a.addEventListener('click', function(e){ e.preventDefault(); go(a.dataset.id); });
     });
-    document.querySelectorAll('[data-g]').forEach(function(a){
-        a.onclick = function(){
-            var g = document.getElementById('g'+a.dataset.g);
-            if(g) g.classList.toggle('show');
-            a.classList.toggle('open-g');
-        };
+    
+    // সাইডবারের সাব-মেনু টগল করার ফিক্সড ইভেন্ট লিসেনার
+    document.querySelectorAll('#side a[data-g]').forEach(function(a){
+        a.addEventListener('click', function(e){
+            e.preventDefault();
+            var gId = a.getAttribute('data-g');
+            var subMenu = document.getElementById('g' + gId);
+            if(subMenu){
+                subMenu.classList.toggle('show');
+                a.classList.toggle('open-g');
+            }
+        });
     });
     
     var tgEl = document.getElementById('tg'); if(tgEl) tgEl.onclick = function(){ document.body.classList.toggle('open'); };
@@ -792,18 +797,17 @@ function initApp(){
     window.addEventListener('hashchange', function(){
         if(!IS_LOGGED_IN) { showLanding(); return; }
         var h = (location.hash||'').slice(1);
-        if(h && h !== CUR){ CUR = h; render(); }
+        if(h && V[h]){ CUR = h; render(); }
     });
     
-    // পেজ লোড হওয়ার সময় যদি আগে থেকেই লগইন করা থাকে তবে সরাসরি ড্যাশবোর্ড বা আগের পেজে নিয়ে যাবে
+    // পেজ লোড হওয়ার সময় স্ট্যাটাস চেক করে সরাসরি ড্যাশবোর্ড বা হ্যাশ পেজে নিয়ে যাওয়া
     if(IS_LOGGED_IN){
         document.getElementById('authwrap').style.display = 'none';
         document.getElementById('appwrap').style.display = '';
-        initApp();
-        loadCloudData();
         APP_READY = true;
+        loadCloudData();
         var h = (location.hash||'').slice(1);
-        if(h && V[h]) CUR = h;
+        if(h && V[h]){ CUR = h; } else { CUR = 'dash'; }
         render();
     } else {
         showLanding();
